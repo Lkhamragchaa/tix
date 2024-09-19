@@ -1,5 +1,103 @@
 <!DOCTYPE html>
-<html>
-    <head></head>
-    <body>Lkhamragchaa Test hij bn</body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Word of the Day</title>
+    <style>
+        html {
+            background-color: antiquewhite;
+        }
+        body {
+            font-size: 30px;
+            font-family: 'Monospace';
+        }
+        .wordnik-word {
+            font-weight: 800;
+            font-size: 1.1em;
+            font-style: italic;
+        }
+        .wordnik-word-partofspeech {
+            font-size: .7rem;
+            font-weight: 400;
+        }
+        #wordnik-wordofday {
+            padding-left: 15px;
+            margin-top: 0px;
+        }
+        #wordnik-wordofday a {
+            color: inherit;
+            text-decoration: none;
+        }
+        #wordnik-wordofday-heading {
+            margin-bottom: 0px;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var apis4librarians_wordnikofdaySimple = function() {
+                function reqListener() {
+                    var data = JSON.parse(this.responseText);
+                    console.log(data);
+
+                    var word = data.word;
+                    var definitions = data.definitions[0].text;
+                    var partOfSpeech = data.definitions[0].partOfSpeech;
+
+                    var d1 = document.getElementById("wordnik-wordofday");
+                    d1.insertAdjacentHTML(
+                        "beforeend",
+                        `<span class="wordnik-word"><a href="https://www.wordnik.com/words/${word}">${word}</a></span><span class="wordnik-word-partofspeech"> ${partOfSpeech}</span> <br><span class="wordnik-word-definition">${definitions}</span>`
+                    );
+
+                    // Translate the word
+                    translateWord(definitions);
+                }
+                var oReq = new XMLHttpRequest();
+                oReq.addEventListener("load", reqListener);
+                oReq.open(
+                    "GET",
+                    "https://api.wordnik.com/v4/words.json/wordOfTheDay?api_key=zlawhk9nlar3ymg71e4un9eq3rdwo92ao0ys4dec947xyzx7s"
+                );
+                oReq.send();
+            };
+
+            function translateWord(word) {
+                var apiKey = 'AIzaSyA95bpPt7u801m6LHFs3oqX_SAUWg70c6E';
+                var targetLanguage = 'mn'; // Example: 'es' for Spanish
+                var url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+
+                var data = {
+                    q: word,
+                    target: targetLanguage
+                };
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var translatedText = data.data.translations[0].translatedText;
+                    var translationElement = document.createElement('p');
+                    translationElement.textContent = `Translation: ${translatedText}`;
+                    document.getElementById('wordnik-wordofday').appendChild(translationElement);
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            apis4librarians_wordnikofdaySimple();
+        });
+    </script>
+</head>
+<body>
+    <h3 id="wordnik-wordofday-heading">Word of the day!</h3>
+    <div id="wordnik-wordofday"></div>
+    <div id="but1"><button type="button"
+        onclick="document.getElementById('-wordofday').innerHTML = translatedText">Are you wanna translate?</button></div>
+        <p id="-wordofday"></p>
+</body>
 </html>
